@@ -41,9 +41,11 @@ def _kotlin_library_impl(ctx):
         inputs += [file]
         args += [file.path]
 
+    # Make sure jars are listed as inputs for bazel to generate them
+    # for us.
     for target in jars:
-        print("jar input %s" % target)
         inputs += [file for file in target.files]
+
     # Run the compiler
     ctx.action(
         mnemonic = "KotlinCompile",
