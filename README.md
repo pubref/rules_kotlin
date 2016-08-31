@@ -114,7 +114,6 @@ executable jar.
 
 | Name | Type | Description |
 | --- | --- | --- | --- |
-
 | `srcs` | `label_list` | Kotlin source files `*.kt` |
 | `deps` | `label_list` | List of `kotlin_library` targets |
 | `jars` | `label_list` | List of jar provider targets (`java_library`, `java_import`) |
@@ -128,6 +127,17 @@ executable jar.
 That's it!  Hopefully these rules with make it easy to mix kotlin and
 traditional java code in your projects and take advantage of bazel's
 approach to fast, repeatable, and reliable builds.
+
+## Examples
+
+To run the examples in this repository, clone the repo:
+
+```sh
+$ git clone https://github.com/pubref/rules_kotlin
+$ cd rules_kotlin
+$ bazel run examples/helloworld:main_kt
+$ bazel run examples/helloworld:main_java
+```
 
 ## TODO
 
