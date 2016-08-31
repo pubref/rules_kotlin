@@ -34,13 +34,16 @@ def _kotlin_library_impl(ctx):
     # Need to traverse back up to execroot, then down again
     kotlin_home = ctx.executable._kotlinc.dirname \
                   + "/../../../../../external/com_github_jetbrains_kotlin"
-    args += ["-kotlin-home", kotlin_home]
+    #args += ["-kotlin-home", kotlin_home]
 
     # Add in filepaths
     for file in ctx.files.srcs:
         inputs += [file]
         args += [file.path]
 
+    for target in jars:
+        print("jar input %s" % target)
+        inputs += [file for file in target.files]
     # Run the compiler
     ctx.action(
         mnemonic = "KotlinCompile",
@@ -48,6 +51,9 @@ def _kotlin_library_impl(ctx):
         outputs = [kt_jar],
         executable = ctx.executable._kotlinc,
         arguments = args,
+        env = {
+            "KOTLIN_HOME": kotlin_home,
+        }
     )
 
     return struct(
