@@ -2,6 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 load("//kotlin:rules.bzl", "kotlin_library", "kotlin_binary")
 
+
 # A kotlin binary that depends on another kotlin rule (using kotlin
 # within kotlin + java within kotlin)
 kotlin_binary(
@@ -30,4 +31,16 @@ kotlin_library(
 java_library(
     name = "milk",
     srcs = ["SoyMilk.java"],
+)
+
+
+# A java rule that depends on a kotlin rule (using kotlin within traditional java)
+java_test(
+    name = "main_test",
+    test_class = "examples.helloworld.MainTest",
+    srcs = ["MainTest.java"],
+    deps = [
+        ":rules_kt",
+        "@junit4//jar",
+    ]
 )
