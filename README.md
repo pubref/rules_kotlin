@@ -1,6 +1,9 @@
 # Kotlin Rules for Bazel
 [![Build Status](https://travis-ci.org/pubref/rules_kotlin.svg?branch=master)](https://travis-ci.org/pubref/rules_kotlin)
 
+> Note: **These rules require Bazel 0.3.1 or higher**.  The travis
+> build fails for 0.3.0 and below.
+
 These rules are for building [Kotlin][kotlin] source with with
 [Bazel][bazel].
 
