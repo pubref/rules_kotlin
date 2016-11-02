@@ -130,7 +130,7 @@ _kotlin_library_attrs = {
     # Not really implemented yet.
     "data": attr.label_list(
         allow_files = True,
-        cfg = DATA_CFG,
+        cfg = 'data',
     ),
 
     # Jars to put on the kotlinc classpath
@@ -148,12 +148,14 @@ _kotlin_library_attrs = {
     "_kotlinc": attr.label(
         default=Label("@com_github_jetbrains_kotlin//:kotlinc"),
         executable = True,
+        cfg = 'host',
     ),
 
     # kotlin runner (a shell script)
     "_kotlin": attr.label(
         default=Label("@com_github_jetbrains_kotlin//:kotlin"),
         executable = True,
+        cfg = 'host',
     ),
 
     # kotlin runtime
@@ -213,7 +215,7 @@ def kotlin_binary(name,
                   **kwargs):
 
     _kotlin_library(
-        name = name,
+        name = name + "_kt",
         jars = jars,
         srcs = srcs,
         deps = deps,
@@ -222,10 +224,10 @@ def kotlin_binary(name,
     )
 
     native.java_binary(
-        name = name + "_kt",
+        name = name,
         srcs = java_srcs,
         runtime_deps = [
-            name + ".jar",
+            name + "_kt.jar",
             "@com_github_jetbrains_kotlin//:runtime",
         ] + runtime_deps + jars,
         **kwargs
@@ -256,8 +258,8 @@ sh_binary(
 def kotlin_repositories():
     native.new_http_archive(
         name = "com_github_jetbrains_kotlin",
-        url = "https://github.com/JetBrains/kotlin/releases/download/v1.0.3/kotlin-compiler-1.0.3.zip",
-        sha256 = "37615f1d63e8500cd33c7f3e60b715263f65189d6d8f25defba78968c896dc97",
+        url = "https://github.com/JetBrains/kotlin/releases/download/build-1.1-M02/kotlin-compiler-1.1-M02.zip",
+        sha256 = "cbd656a0dd35a397ec6459592e1074f5f5767fbe87a6377e32c23053d32d011c",
         build_file_content = KOTLIN_BUILD,
         strip_prefix = "kotlinc",
     )
