@@ -258,8 +258,8 @@ sh_binary(
 def kotlin_repositories():
     native.new_http_archive(
         name = "com_github_jetbrains_kotlin",
-        url = "https://github.com/JetBrains/kotlin/releases/download/build-1.1-M02/kotlin-compiler-1.1-M02.zip",
-        sha256 = "cbd656a0dd35a397ec6459592e1074f5f5767fbe87a6377e32c23053d32d011c",
+        url = "https://github.com/JetBrains/kotlin/releases/download/v1.0.6/kotlin-compiler-1.0.6.zip",
+        sha256 = "42a20b72d1e90f9efa9d13aab97559f478cc32b7c2e6da8569cdc3741a8e14b6",
         build_file_content = KOTLIN_BUILD,
         strip_prefix = "kotlinc",
     )
