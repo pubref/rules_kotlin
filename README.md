@@ -39,6 +39,17 @@ sh_binary rule @com_github_jetbrains_kotlin//:kotlinc
 sh_binary rule @com_github_jetbrains_kotlin//:kotlin
 ```
 
+## bazel.rc
+
+Add the following line to your `tools/bazel.rc` file:
+
+```
+build --strategy=KotlinCompile=standalone
+```
+
+Alternatively, you can also add `--strategy=KotlinCompile=standalone` parameters
+to every `bazel run`, `bazel build`, etc. commands involving a kotlin rule.
+
 ## Package (BUILD file) rules
 
 Add the following to your BUILD file:
