@@ -127,7 +127,7 @@ executable jar.
 ### Rule attributes
 
 | Name | Type | Description |
-| --- | --- | --- | --- |
+| --- | --- | --- |
 | `srcs` | `label_list` | Kotlin source files `*.kt` |
 | `deps` | `label_list` | List of `kotlin_library` targets |
 | `jars` | `label_list` | List of jar provider targets (`java_library`, `java_import`) |
