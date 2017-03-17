@@ -14,9 +14,9 @@ def _kotlin_library_impl(ctx):
     args += ["-X%s" % opt for opt in ctx.attr.x_opts]
 
     # Plugin options
-    for k, v in ctx.attr.plugin_opts:
+    for k, v in ctx.attr.plugin_opts.items():
         args += ["-P"]
-        args += ["plugin:%s:%s" % (k, v)]
+        args += ["plugin:%s=\"%s\"" % (k, v)]
 
     # Make classpath if needed, first from this rules, then from
     # dependent rules.
