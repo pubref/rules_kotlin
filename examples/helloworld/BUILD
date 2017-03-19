@@ -10,7 +10,7 @@ kotlin_binary(
     main_class = "examples.helloworld.MainKt",
     srcs = ["main.kt"],
     deps = [":rules"],
-    jars = [":milk"]
+    java_deps = [":milk"]
 )
 
 # A java rule that depends on a kotlin rule (using kotlin within traditional java)
@@ -18,13 +18,14 @@ java_binary(
     name = "main_java",
     main_class = "examples.helloworld.Main",
     srcs = ["Main.java"],
-    deps = [":rules_kt"]
+    deps = [":rules_kt"],
 )
 
 # A simple kotlin rule that defines "data classes"
 kotlin_library(
     name = "rules",
     srcs = ["rules.kt"],
+    java_deps = [":milk"]
 )
 
 # A simple java class that defines soy milk
@@ -33,12 +34,12 @@ java_library(
     srcs = ["SoyMilk.java"],
 )
 
-
 # A java rule that depends on a kotlin rule (using kotlin within traditional java)
 java_test(
     name = "main_test",
     test_class = "examples.helloworld.MainTest",
     srcs = ["MainTest.java"],
+    size = "small",
     deps = [
         ":rules_kt",
         "@junit4//jar",
