@@ -4,6 +4,7 @@ package examples.helloworld;
 import examples.helloworld.KotlinLibraryRule;
 
 public class Main {
+
   public static void main(String[] args) {
     KotlinLibraryRule rule = new KotlinLibraryRule(
       "foo",
@@ -11,8 +12,6 @@ public class Main {
       new java.util.ArrayList());
     System.out.println("A bazel kotlin_library rule looks something like: ");
     System.out.println(rule.toString());
-
-
   }
 
   void testRuleName() {
