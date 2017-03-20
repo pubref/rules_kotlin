@@ -10,7 +10,7 @@ kotlin_binary(
     main_class = "examples.helloworld.MainKt",
     srcs = ["main.kt"],
     deps = [":rules"],
-    java_deps = [":milk"]
+    java_deps = [":milk"],
 )
 
 # A java rule that depends on a kotlin rule (using kotlin within traditional java)

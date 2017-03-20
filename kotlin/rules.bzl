@@ -49,16 +49,30 @@ def _kotlin_compile_impl(ctx):
         args += [file.path]
 
     # Run the compiler
-    ctx.action(
-        mnemonic = "KotlinCompile",
-        inputs = inputs,
-        outputs = [kt_jar],
-        executable = ctx.executable._kotlinc,
-        arguments = args,
-        env = {
-            "KOTLIN_HOME": kotlin_home,
-        }
-    )
+    if ctx.attr.use_worker:
+        ctx.action(
+            mnemonic = "KotlinCompile",
+            inputs = inputs,
+            outputs = [kt_jar],
+            executable = ctx.executable._kotlinw,
+            execution_requirements={"supports-workers": "1"},
+            arguments = ['KotlinCompiler'] + args,
+            env = {
+                "KOTLIN_HOME": kotlin_home,
+            },
+            progress_message="Compiling %d Kotlin source files to %s" % (len(ctx.files.srcs), ctx.outputs.kt_jar.short_path)
+        )
+    else:
+        ctx.action(
+            mnemonic = "KotlinCompile",
+            inputs = inputs,
+            outputs = [kt_jar],
+            executable = ctx.executable._kotlinc,
+            arguments = args,
+            env = {
+                "KOTLIN_HOME": kotlin_home,
+            }
+        )
 
     return struct(
         files = set([kt_jar]),
@@ -115,9 +129,21 @@ _kotlin_compile_attrs = {
         cfg = 'host',
     ),
 
+    # kotlin compiler worker (a java executable defined in this repo)
+    "_kotlinw": attr.label(
+        default=Label("//java/org/pubref/rules/kotlin:worker"),
+        executable = True,
+        cfg = 'host',
+    ),
+
     # kotlin runtime
     "_runtime": attr.label(
         default=Label("@com_github_jetbrains_kotlin//:runtime"),
+    ),
+
+    # Advanced options
+    "use_worker": attr.bool(
+        default = True,
     ),
 
 }
@@ -170,6 +196,7 @@ def kotlin_binary(name,
                   jars = [],
                   srcs = [],
                   deps = [],
+                  use_worker = False,
                   x_opts = [],
                   plugin_opts = {},
                   java_deps = [],
@@ -182,6 +209,7 @@ def kotlin_binary(name,
         jars = jars + java_library_jars,
         srcs = srcs,
         deps = deps,
+        use_worker = use_worker,
         x_opts = x_opts,
         plugin_opts = plugin_opts,
     )
@@ -207,6 +235,10 @@ java_import(
     name = "runtime",
     jars = ["lib/kotlin-runtime.jar"],
 )
+java_import(
+    name = "compiler",
+    jars = ["lib/kotlin-compiler.jar"],
+)
 sh_binary(
     name = "kotlin",
     srcs = ["bin/kotlin"],
@@ -215,6 +247,7 @@ sh_binary(
     name = "kotlinc",
     srcs = ["bin/kotlinc"],
 )
+exports_files(["src"])
 """
 
 def kotlin_repositories():
