@@ -1,7 +1,9 @@
 package examples.helloworld;
 
+import com.google.common.base.Joiner;
 // Not actually a necessary import since both in same package
 import examples.helloworld.KotlinLibraryRule;
+
 
 public class Main {
 

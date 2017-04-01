@@ -19,7 +19,7 @@ Add the following to your WORKSPACE file:
 git_repository(
     name = "org_pubref_rules_kotlin",
     remote = "https://github.com/pubref/rules_kotlin.git",
-    tag = "v0.2", # update as needed
+    tag = "v0.2.2", # update as needed
 )
 load("@org_pubref_rules_kotlin//kotlin:rules.bzl", "kotlin_repositories")
 kotlin_repositories()
@@ -56,7 +56,7 @@ kotlin_library(
     name = "my_kotlin_lib",
     srcs = ["kotlin_source_file.kt"],
     deps = [":some_other_kotlin_library_rule"],
-    java_deps = [":some_other_java_library_rule"],
+    java_deps = [":some_other_java_library_rule", "@another_maven_jar//jar"],
 )
 ```
 
@@ -98,7 +98,7 @@ android_binary(
 | --- | --- | --- |
 | `srcs` | `label_list` | Kotlin source files `*.kt` |
 | `deps` | `label_list` | List of `kotlin_library` targets |
-| `java_deps` | `label_list` | List of java provider targets (`java_library`, `java_import`) |
+| `java_deps` | `label_list` | List of java provider targets (`java_library`, `java_import`, `...`) |
 | `jars` | `label_list` | List of jar file targets (`*.jar`) |
 | `x_opts` | `string_list` | List of additional `-X` options to `kotlinc` |
 | `plugin_opts` | `string_dict` | List of additional `-P` options to `kotlinc` |

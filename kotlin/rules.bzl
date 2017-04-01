@@ -18,26 +18,38 @@ def _kotlin_compile_impl(ctx):
         args += ["-P"]
         args += ["plugin:%s=\"%s\"" % (k, v)]
 
-    # Make classpath if needed.  Include those from this rule and from
-    # dependent rules.
-    jars = [] + ctx.attr.jars
+    # Make classpath if needed.  Include those from this and dependent rules.
+    jars = []
+
+    # Populate from (transitive) java dependencies
+    for dep in ctx.attr.java_deps:
+        # Add-in all source and generated jar files
+        for file in dep.files:
+            jars.append(file)
+        # Add-in transitive dependencies
+        for file in dep.java.transitive_deps:
+            jars.append(file)
+
+    # Populate from (transitive) kotlin dependencies
     for dep in ctx.attr.deps:
-        jars += [jar.files for jar in dep.kt.transitive_jars]
+        jars += [file for file in dep.kt.transitive_jars]
+
+    # Populate from jar dependencies
+    for fileset in ctx.attr.jars:
+        # The fileset object is either a ConfiguredTarget OR a depset.
+        files = getattr(fileset, 'files', None)
+        if files:
+            for file in files:
+                jars += [file]
+        else:
+            for file in fileset:
+                jars += [file]
+
     if jars:
-        jarfiles = []
-        for fileset in jars:
-            # The fileset object is either a ConfiguredTarget OR a depset.
-            files = getattr(fileset, 'files', None)
-            if files:
-                for file in files:
-                    jarfiles += [file.path]
-                    inputs += [file]
-            else:
-                for file in fileset:
-                    jarfiles += [file.path]
-                    inputs += [file]
-        classpath = ":".join(jarfiles)
-        args += ["-cp", classpath]
+        # De-duplicate
+        jarsetlist = list(set(jars))
+        args += ["-cp", ":".join([file.path for file in jarsetlist])]
+        inputs += jarsetlist
 
     # Need to traverse back up to execroot, then down again
     kotlin_home = ctx.executable._kotlinc.dirname \
@@ -66,7 +78,7 @@ def _kotlin_compile_impl(ctx):
         kt = struct(
             srcs = ctx.attr.srcs,
             jar = kt_jar,
-            transitive_jars = jars,
+            transitive_jars = [kt_jar] + jars,
             home = kotlin_home,
         ),
     )
@@ -91,13 +103,18 @@ _kotlin_compile_attrs = {
         providers = ["kt"],
     ),
 
+    # Dependent java rules.
+    "java_deps": attr.label_list(
+        providers = ["java"],
+    ),
+
     # Not really implemented yet.
     "data": attr.label_list(
         allow_files = True,
         cfg = 'data',
     ),
 
-    # Jars to put on the kotlinc classpath
+    # Additional jar files to put on the kotlinc classpath
     "jars": attr.label_list(
         allow_files = jar_filetype,
     ),
@@ -135,24 +152,12 @@ kotlin_compile = rule(
 )
 
 
-def _make_jars_list_from_java_deps(deps = []):
-    jars = []
-    for dep in deps:
-        path = ""
-        basename = dep
-        if dep.find(":") >= 0:
-            parts = dep.split(':')
-            path = parts[0] if len(parts) > 0 else ""
-            basename = parts[1]
-        jars.append("%s:lib%s.jar" % (path, basename))
-    return jars
-
-
 def kotlin_library(name, jars = [], java_deps = [], **kwargs):
 
     kotlin_compile(
         name = name,
-        jars = jars + _make_jars_list_from_java_deps(java_deps),
+        jars = jars,
+        java_deps = java_deps,
         **kwargs
     )
 
@@ -175,11 +180,10 @@ def kotlin_binary(name,
                   java_deps = [],
                   **kwargs):
 
-    java_library_jars = _make_jars_list_from_java_deps(java_deps)
-
     kotlin_compile(
         name = name + "_kt",
-        jars = jars + java_library_jars,
+        jars = jars,
+        java_deps = java_deps,
         srcs = srcs,
         deps = deps,
         x_opts = x_opts,
