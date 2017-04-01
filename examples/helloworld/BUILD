@@ -10,7 +10,10 @@ kotlin_binary(
     main_class = "examples.helloworld.MainKt",
     srcs = ["main.kt"],
     deps = [":rules"],
-    java_deps = [":milk"]
+    java_deps = [
+        ":milk",
+        ":guava",
+    ],
 )
 
 # A java rule that depends on a kotlin rule (using kotlin within traditional java)
@@ -18,7 +21,10 @@ java_binary(
     name = "main_java",
     main_class = "examples.helloworld.Main",
     srcs = ["Main.java"],
-    deps = [":rules_kt"],
+    deps = [
+        ":rules_kt",
+        ":guava",
+    ],
 )
 
 # A simple kotlin rule that defines "data classes"
@@ -44,4 +50,12 @@ java_test(
         ":rules_kt",
         "@junit4//jar",
     ]
+)
+
+# Included to test dependent java providers
+java_library(
+    name = "guava",
+    exports = [
+        "@com_google_guava_guava_21_0//jar",
+    ],
 )

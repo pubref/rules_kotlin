@@ -12,3 +12,9 @@ maven_jar(
     artifact = "io.reactivex:rxjava:jar:1.2.1",
     #sha1 = "ssa",
 )
+
+# Used to demonstrate/test maven dependencies
+maven_jar(
+    name = "com_google_guava_guava_21_0",
+    artifact = "com.google.guava:guava:jar:21.0",
+)
