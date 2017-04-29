@@ -27,7 +27,7 @@ kotlin_repositories()
 
 This will fetch a
 [release](https://github.com/JetBrains/kotlin/releases) (currently
-1.0.3) and expose the shell scripts and the runtime library.
+1.1.2-2) and expose the shell scripts and the runtime library.
 
 ```sh
 bazel query @com_github_jetbrains_kotlin//... --output label_kind
