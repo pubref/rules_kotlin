@@ -10,7 +10,6 @@ maven_jar(
 maven_jar(
     name = "io_reactivex_rxjava",
     artifact = "io.reactivex:rxjava:jar:1.2.1",
-    #sha1 = "ssa",
 )
 
 # Used to demonstrate/test maven dependencies
