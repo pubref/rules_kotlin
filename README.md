@@ -1,8 +1,7 @@
 # Kotlin Rules for Bazel
 [![Build Status](https://travis-ci.org/pubref/rules_kotlin.svg?branch=master)](https://travis-ci.org/pubref/rules_kotlin)
 
-> Note: **These rules require Bazel 0.3.1 or higher**.  The travis
-> build fails for 0.3.0 and below.
+> Note: **These rules require Bazel 0.3.1 or higher**.
 
 These rules are for building [Kotlin][kotlin] source with with
 [Bazel][bazel].
@@ -19,7 +18,7 @@ Add the following to your WORKSPACE file:
 git_repository(
     name = "org_pubref_rules_kotlin",
     remote = "https://github.com/pubref/rules_kotlin.git",
-    tag = "v0.2.2", # update as needed
+    tag = "v0.2.3", # update as needed
 )
 load("@org_pubref_rules_kotlin//kotlin:rules.bzl", "kotlin_repositories")
 kotlin_repositories()
@@ -191,6 +190,7 @@ $ bazel run examples/helloworld:main_java
 1. Implement a `kotlin_test` rule.
 2. Proper `data` and runfiles support.
 3. Research incremental compilation and bazel worker integration.
+4. kapt integration.
 
 [bazel]: http://www.bazel.io
 [kotlin]: http://www.kotlinlang.org

@@ -8,7 +8,7 @@ os:
   - osx
 
 env:
-  - V=HEAD
+  #- V=HEAD
   - V=0.4.5
   - V=0.4.4
   - V=0.4.3
