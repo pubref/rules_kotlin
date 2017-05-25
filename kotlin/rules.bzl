@@ -18,6 +18,9 @@ def _kotlin_compile_impl(ctx):
         args += ["-P"]
         args += ["plugin:%s=\"%s\"" % (k, v)]
 
+    # Kotlin home - typically the dir 'external/com_github_jetbrains_kotlin'
+    args += ["-kotlin-home", ctx.file._runtime.dirname + '/..']
+
     # Make classpath if needed.  Include those from this and dependent rules.
     jars = []
 
@@ -51,14 +54,13 @@ def _kotlin_compile_impl(ctx):
         args += ["-cp", ":".join([file.path for file in jarsetlist])]
         inputs += jarsetlist
 
-    # Need to traverse back up to execroot, then down again
-    kotlin_home = ctx.executable._kotlinc.dirname \
-                  + "/../../../../../external/com_github_jetbrains_kotlin"
-
     # Add in filepaths
     for file in ctx.files.srcs:
         inputs += [file]
         args += [file.path]
+
+    # Add all home libs to sandbox
+    inputs += ctx.files._kotlin_home
 
     # Run the compiler
     ctx.action(
@@ -67,9 +69,6 @@ def _kotlin_compile_impl(ctx):
         outputs = [kt_jar],
         executable = ctx.executable._kotlinc,
         arguments = args,
-        env = {
-            "KOTLIN_HOME": kotlin_home,
-        }
     )
 
     return struct(
@@ -79,7 +78,6 @@ def _kotlin_compile_impl(ctx):
             srcs = ctx.attr.srcs,
             jar = kt_jar,
             transitive_jars = [kt_jar] + jars,
-            home = kotlin_home,
         ),
     )
 
@@ -132,9 +130,15 @@ _kotlin_compile_attrs = {
         cfg = 'host',
     ),
 
+    # kotlin home (for runtime libraries discovery)
+    "_kotlin_home": attr.label(
+        default=Label("@com_github_jetbrains_kotlin//:home"),
+    ),
+
     # kotlin runtime
     "_runtime": attr.label(
         default=Label("@com_github_jetbrains_kotlin//:runtime"),
+        single_file = True,
     ),
 
 }
@@ -207,6 +211,10 @@ def kotlin_binary(name,
 
 KOTLIN_BUILD = """
 package(default_visibility = ["//visibility:public"])
+filegroup(
+    name = "home",
+    srcs = glob(["lib/*.jar"]),
+)
 java_import(
     name = "runtime",
     jars = ["lib/kotlin-runtime.jar"],
