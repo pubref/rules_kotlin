@@ -7,6 +7,7 @@ java_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":compiler",
+        ":preloader",
         "//java/io/bazel/rules/closure:BazelWorker",
         "//java/io/bazel/rules/closure/program",
         "@com_google_dagger",
@@ -25,5 +26,18 @@ java_library(
         "//java/io/bazel/rules/closure/program",
         "@com_google_guava",
         "@com_github_jetbrains_kotlin//:compiler",
+    ],
+)
+
+java_library(
+    name = "preloader",
+    srcs = [
+        "KotlinPreloader.java",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//java/io/bazel/rules/closure/program",
+        "@com_google_guava",
+        "@com_github_jetbrains_kotlin//:preloader",
     ],
 )

@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load("//kotlin:rules.bzl", "kotlin_library", "kotlin_binary")
+load("//kotlin:rules.bzl", "kotlin_library", "kotlin_binary", "kotlin_test")
 
 
 # A kotlin binary that depends on another kotlin rule (using kotlin
@@ -50,6 +50,20 @@ java_test(
         ":rules_kt",
         "@junit4//jar",
     ]
+)
+
+# A kotlin test rule that depends on a kotlin rule
+kotlin_test(
+    name = "main_kt_test",
+    test_class = "examples.helloworld.MainKtTest",
+    srcs = ["MainKtTest.kt"],
+    size = "small",
+    deps = [
+        ":rules",
+    ],
+    java_deps = [
+        "@junit4//jar",
+    ],
 )
 
 # Included to test dependent java providers

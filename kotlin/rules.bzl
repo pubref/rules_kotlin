@@ -7,7 +7,12 @@ load("//kotlin:kotlin_repositories.bzl", "kotlin_repositories")
 def _kotlin_compile_impl(ctx):
     kt_jar = ctx.outputs.kt_jar
     inputs = []
-    args = []
+
+    args = [
+        "KotlinPreloader",
+        "-cp", ctx.file._kotlin_compiler.path,
+        "org.jetbrains.kotlin.cli.jvm.K2JVMCompiler",
+    ]
 
     # Single output jar
     args += ["-d", kt_jar.path]
@@ -20,8 +25,12 @@ def _kotlin_compile_impl(ctx):
         args += ["-P"]
         args += ["plugin:%s=\"%s\"" % (k, v)]
 
-    # Kotlin home - typically the dir 'external/com_github_jetbrains_kotlin'
-    args += ["-kotlin-home", ctx.file._runtime.dirname + '/..']
+    # Kotlin home - typically the dir
+    # 'external/com_github_jetbrains_kotlin'
+    args += ["-kotlin-home", ctx.file._kotlin_compiler.dirname + '/..']
+    # Add all home libs to sandbox so they are discoverable by the
+    # preloader
+    inputs += ctx.files._kotlin_home
 
     # Make classpath if needed.  Include those from this and dependent rules.
     jars = []
@@ -66,29 +75,16 @@ def _kotlin_compile_impl(ctx):
         inputs += [file]
         args += [file.path]
 
-    # Add all home libs to sandbox
-    inputs += ctx.files._kotlin_home
-
     # Run the compiler
-
-    if ctx.attr.use_worker:
-        ctx.action(
-            mnemonic = "KotlinCompile",
-            inputs = inputs,
-            outputs = [kt_jar],
-            executable = ctx.executable._kotlinw,
-            execution_requirements={"supports-workers": "1"},
-            arguments = ['KotlinCompiler'] + args,
-            progress_message="Compiling %d Kotlin source files to %s" % (len(ctx.files.srcs), ctx.outputs.kt_jar.short_path)
-        )
-    else:
-        ctx.action(
-            mnemonic = "KotlinCompile",
-            inputs = inputs,
-            outputs = [kt_jar],
-            executable = ctx.executable._kotlinc,
-            arguments = args,
-        )
+    ctx.action(
+        mnemonic = "KotlinCompile",
+        inputs = inputs,
+        outputs = [kt_jar],
+        executable = ctx.executable._kotlinw,
+        execution_requirements = {"supports-workers": "1"},
+        arguments = args,
+        progress_message="Compiling %d Kotlin source files to %s" % (len(ctx.files.srcs), ctx.outputs.kt_jar.short_path)
+    )
 
     return struct(
         files = set([kt_jar]),
@@ -125,7 +121,7 @@ _kotlin_compile_attrs = {
         providers = ["java"],
     ),
 
-    # Dependent java rules.
+    # Dependent android rules.
     "android_deps": attr.label_list(
         providers = ["android"],
     ),
@@ -147,16 +143,15 @@ _kotlin_compile_attrs = {
     # Plugin options
     "plugin_opts": attr.string_dict(),
 
-    # kotlin compiler (a shell script)
-    "_kotlinc": attr.label(
-        default=Label("@com_github_jetbrains_kotlin//:kotlinc"),
-        executable = True,
-        cfg = 'host',
-    ),
-
     # kotlin home (for runtime libraries discovery)
     "_kotlin_home": attr.label(
         default=Label("@com_github_jetbrains_kotlin//:home"),
+    ),
+
+    # kotlin compiler jar
+    "_kotlin_compiler": attr.label(
+        default=Label("@com_github_jetbrains_kotlin//:compiler"),
+        single_file = True,
     ),
 
     # kotlin compiler worker (a java executable defined in this repo)
@@ -164,17 +159,6 @@ _kotlin_compile_attrs = {
         default=Label("//java/org/pubref/rules/kotlin:worker"),
         executable = True,
         cfg = 'host',
-    ),
-
-    # kotlin runtime
-    "_runtime": attr.label(
-        default=Label("@com_github_jetbrains_kotlin//:runtime"),
-        single_file = True,
-    ),
-
-    # Advanced options
-    "use_worker": attr.bool(
-        default = True,
     ),
 
 }
@@ -215,7 +199,6 @@ def kotlin_binary(name,
                   jars = [],
                   srcs = [],
                   deps = [],
-                  use_worker = False,
                   x_opts = [],
                   plugin_opts = {},
                   java_deps = [],
@@ -227,7 +210,6 @@ def kotlin_binary(name,
         java_deps = java_deps,
         srcs = srcs,
         deps = deps,
-        use_worker = use_worker,
         x_opts = x_opts,
         plugin_opts = plugin_opts,
     )
@@ -236,7 +218,36 @@ def kotlin_binary(name,
         name = name,
         runtime_deps = [
             name + "_kt.jar",
-            "@com_github_jetbrains_kotlin//:runtime",
-        ] + java_deps,
+        ] + java_deps + [dep + "_kt" for dep in deps],
+        **kwargs
+    )
+
+
+def kotlin_test(name,
+                jars = [],
+                srcs = [],
+                deps = [],
+                x_opts = [],
+                plugin_opts = {},
+                java_deps = [],
+                **kwargs):
+
+    java_deps.append("@com_github_jetbrains_kotlin//:test")
+
+    kotlin_compile(
+        name = name + "_kt",
+        jars = jars,
+        java_deps = java_deps,
+        srcs = srcs,
+        deps = deps,
+        x_opts = x_opts,
+        plugin_opts = plugin_opts,
+    )
+
+    native.java_test(
+        name = name,
+        runtime_deps = [
+            name + "_kt.jar",
+        ] + java_deps + [dep + "_kt" for dep in deps],
         **kwargs
     )

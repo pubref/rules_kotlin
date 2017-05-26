@@ -11,8 +11,20 @@ java_import(
     jars = ["lib/kotlin-runtime.jar"],
 )
 java_import(
+    name = "stdlib",
+    jars = ["lib/kotlin-stdlib.jar"],
+)
+java_import(
     name = "compiler",
     jars = ["lib/kotlin-compiler.jar"],
+)
+java_import(
+    name = "preloader",
+    jars = ["lib/kotlin-preloader.jar"],
+)
+java_import(
+    name = "test",
+    jars = ["lib/kotlin-test.jar"],
 )
 sh_binary(
     name = "kotlin",

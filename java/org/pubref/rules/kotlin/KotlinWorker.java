@@ -50,6 +50,8 @@ public final class KotlinWorker implements CommandLineProgram {
     switch (head) {
       case "KotlinCompiler":
         return new KotlinCompiler().apply(tail);
+    case "KotlinPreloader":
+      return new KotlinPreloader().apply(tail);
       default:
         output.println(
             "\nERROR: First flag to KotlinWorker should be specific compiler to run, "
