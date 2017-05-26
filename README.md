@@ -1,3 +1,11 @@
+<table><tr>
+<td><img src="https://github.com/pubref/rules_protobuf/blob/master/images/bazel.png" width="120"/></td>
+<td><img src="https://kotlinlang.org/assets/images/open-graph/kotlin_250x250.png" width="120"/></td>
+</tr><tr>
+<td>Bazel</td>
+<td>Kotlin</td>
+</tr></table>
+
 # Kotlin Rules for Bazel
 [![Build Status](https://travis-ci.org/pubref/rules_kotlin.svg?branch=master)](https://travis-ci.org/pubref/rules_kotlin)
 
@@ -9,6 +17,7 @@ These rules are for building [Kotlin][kotlin] source with with
 1. [kotlin_repositories](#kotlin_repositories)
 1. [kotlin_library](#kotlin_library)
 1. [kotlin_binary](#kotlin_binary)
+1. [kotlin_test](#kotlin_test)
 
 ## Workspace rules
 
@@ -18,7 +27,7 @@ Add the following to your `WORKSPACE` file:
 git_repository(
     name = "org_pubref_rules_kotlin",
     remote = "https://github.com/pubref/rules_kotlin.git",
-    tag = "v0.3.0", # update as needed
+    tag = "v0.3.1", # update as needed
 )
 
 load("@org_pubref_rules_kotlin//kotlin:rules.bzl", "kotlin_repositories")
@@ -40,7 +49,7 @@ dagger (used to build the `KotlinCompiler` bazel worker).
 Add the following to your BUILD file:
 
 ```python
-load("@org_pubref_rules_kotlin//kotlin:rules.bzl", "kotlin_library", "kotlin_binary")
+load("@org_pubref_rules_kotlin//kotlin:rules.bzl", "kotlin_library")
 ```
 
 ### kotlin_library
@@ -95,18 +104,18 @@ android_binary(
 | `srcs` | `label_list` | Kotlin source files `*.kt` |
 | `deps` | `label_list` | List of `kotlin_library` targets |
 | `java_deps` | `label_list` | List of java provider targets (`java_library`, `java_import`, `...`) |
+| `android_deps` | `label_list` | List of android provider targets (`android_library`) |
 | `jars` | `label_list` | List of jar file targets (`*.jar`) |
 | `x_opts` | `string_list` | List of additional `-X` options to `kotlinc` |
 | `plugin_opts` | `string_dict` | List of additional `-P` options to `kotlinc` |
-| `use_worker` | `boolean` | Assign to `False` to disable the use of [bazel workers](https://bazel.build/blog/2015/12/10/java-workers.html).  |
 
 
 ### kotlin_binary
 
-A `kotlin_binary` rule takes the same arguments as a `kotlin_library`,
-plus a required `main_class` argument (the name of the compiled kotlin
-class to run, in java package notation).  This class should have a
-`fun main(...)` entrypoint.  Example:
+A `kotlin_binary` macro takes the same arguments as a
+`kotlin_library`, plus a required `main_class` argument (the name of
+the compiled kotlin class to run, in java package notation).  This
+class should have a `fun main(...)` entrypoint.  Example:
 
 ```python
 kotlin_binary(
@@ -128,6 +137,8 @@ Target :main_kt_deploy.jar up-to-date:
 $ java -jar ./bazel-bin/.../main_kt_deploy.jar
 ```
 
+> The `kotlin-runtime.jar` is implicitly included by the `kotlin_binary` rule.
+
 #### kotlin_binary attributes
 
 Includes all `kotlin_library` attributes as well as:
@@ -137,15 +148,42 @@ Includes all `kotlin_library` attributes as well as:
 | `main_class` | `string` | Main class to run with the `kotlin_binary` rule |
 
 
+### kotlin_test
+
+The `kotlin_test` rule is nearly identical the `kotlin_binary` rule
+(other than calling `java_test` internally rather than `java_binary`).
+
+
+```python
+kotlin_test(
+    name = "main_kt_test",
+    test_class = "examples.helloworld.MainKtTest",
+    srcs = ["MainKtTest.kt"],
+    size = "small",
+    deps = [
+        ":rules",
+    ],
+    java_deps = [
+        "@junit4//jar",
+    ],
+)
+```
+
+```sh
+$ bazel test :main_kt_test.jar
+```
+
+> The `kotlin-test.jar` is implicitly included by the `kotlin_test` rule.
+
 ### kotlin_compile
 
-The `kotlin_compile` rule runs the `kotlinc` tool to generate a `.jar`
-file from a list of kotlin source files.  The `kotlin_library` rule
-(actually, macro) calls this internally and then makes the jarfile
-available to other java rules via a `java_import` rule.
+> TL;DR; You most likely do not need to interact with the
+> `kotlin_compile` rule directly.
 
-In summary, you most likely do not need to interact with the
-`kotlin_compile` rule directly.
+The `kotlin_compile` rule runs the kotlin compiler to generate a
+`.jar` file from a list of kotlin source files.  The `kotlin_library`
+rule calls this internally and then makes the jarfile available to
+other java rules via a `java_import` rule.
 
 # Summary
 
@@ -153,9 +191,9 @@ That's it!  Hopefully these rules with make it easy to mix kotlin and
 traditional java code in your projects and take advantage of bazel's
 approach to fast, repeatable, and reliable builds.
 
-> Note: if you have a bunch of maven (central) dependencies, consider
-> [rules_maven](https://github.com/pubref/rules_maven) for taming the
-> issue of transitive dependencies with your java/kotlin projects.
+> Note: Consider [rules_maven](https://github.com/pubref/rules_maven)
+> for handling transitive maven dependencies with your java/kotlin
+> projects.
 
 ## Examples
 
@@ -167,13 +205,14 @@ $ cd rules_kotlin
 $ bazel query //... --output label_kind
 $ bazel run examples/helloworld:main_kt
 $ bazel run examples/helloworld:main_java
+$ bazel test examples/helloworld:main_test
+$ bazel test examples/helloworld:main_kt_test
 ```
 
 ## TODO
 
-1. Implement a `kotlin_test` rule.
 1. Proper `data` and runfiles support.
-2. Android support.
+2. Proper android support.
 4. kapt support.
 3. Incremental compilation.
 
