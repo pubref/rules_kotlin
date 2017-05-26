@@ -50,6 +50,11 @@ def _kotlin_compile_impl(ctx):
             for file in fileset:
                 jars += [file]
 
+    # Populate from android dependencies
+    for dep in ctx.attr.android_deps:
+        if dep.android.defines_resources:
+            jars.append(dep.android.resource_jar.class_jar)
+
     if jars:
         # De-duplicate
         jarsetlist = list(set(jars))
@@ -118,6 +123,11 @@ _kotlin_compile_attrs = {
     # Dependent java rules.
     "java_deps": attr.label_list(
         providers = ["java"],
+    ),
+
+    # Dependent java rules.
+    "android_deps": attr.label_list(
+        providers = ["android"],
     ),
 
     # Not really implemented yet.
