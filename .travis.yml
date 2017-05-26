@@ -9,6 +9,7 @@ os:
 
 env:
   #- V=HEAD
+  - V=0.5.0
   - V=0.4.5
 
 before_install:
