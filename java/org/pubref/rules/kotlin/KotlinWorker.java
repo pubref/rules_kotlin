@@ -45,8 +45,8 @@ public final class KotlinWorker implements CommandLineProgram {
   public Integer apply(Iterable<String> args) {
     String head = Iterables.getFirst(args, "");
     Iterable<String> tail = Iterables.skip(args, 1);
-    // TODO(pcj): Do we ever expect a different compiler here?
-    // Maybe experiment with incremental compiler.
+    // TODO(pcj): Do we ever expect a different compiler here?  Maybe
+    // experiment with incremental compiler.
     switch (head) {
       case "KotlinCompiler":
         return new KotlinCompiler().apply(tail);

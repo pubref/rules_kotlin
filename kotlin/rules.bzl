@@ -1,3 +1,5 @@
+load("//kotlin:kotlin_repositories.bzl", "kotlin_repositories")
+
 # ################################################################
 # Execution phase
 # ################################################################
@@ -142,17 +144,16 @@ _kotlin_compile_attrs = {
         cfg = 'host',
     ),
 
-<<<<<<< HEAD
     # kotlin home (for runtime libraries discovery)
     "_kotlin_home": attr.label(
         default=Label("@com_github_jetbrains_kotlin//:home"),
-=======
+    ),
+
     # kotlin compiler worker (a java executable defined in this repo)
     "_kotlinw": attr.label(
         default=Label("//java/org/pubref/rules/kotlin:worker"),
         executable = True,
         cfg = 'host',
->>>>>>> worker
     ),
 
     # kotlin runtime
@@ -228,44 +229,4 @@ def kotlin_binary(name,
             "@com_github_jetbrains_kotlin//:runtime",
         ] + java_deps,
         **kwargs
-    )
-
-
-# ################################################################
-# Loading phase
-# ################################################################
-
-
-KOTLIN_BUILD = """
-package(default_visibility = ["//visibility:public"])
-filegroup(
-    name = "home",
-    srcs = glob(["lib/*.jar"]),
-)
-java_import(
-    name = "runtime",
-    jars = ["lib/kotlin-runtime.jar"],
-)
-java_import(
-    name = "compiler",
-    jars = ["lib/kotlin-compiler.jar"],
-)
-sh_binary(
-    name = "kotlin",
-    srcs = ["bin/kotlin"],
-)
-sh_binary(
-    name = "kotlinc",
-    srcs = ["bin/kotlinc"],
-)
-exports_files(["src"])
-"""
-
-def kotlin_repositories():
-    native.new_http_archive(
-        name = "com_github_jetbrains_kotlin",
-        url = "https://github.com/JetBrains/kotlin/releases/download/v1.1.2-2/kotlin-compiler-1.1.2-2.zip",
-        sha256 = "57e18528f665675206e88cdc0bd42d1550b10f2508e08035270974d7abec3f2f",
-        build_file_content = KOTLIN_BUILD,
-        strip_prefix = "kotlinc",
     )

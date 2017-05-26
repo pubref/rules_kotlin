@@ -1,7 +1,7 @@
 # Kotlin Rules for Bazel
 [![Build Status](https://travis-ci.org/pubref/rules_kotlin.svg?branch=master)](https://travis-ci.org/pubref/rules_kotlin)
 
-> Note: **These rules require Bazel 0.3.1 or higher**.
+> Note: **These rules require Bazel 0.4.5 or higher**.
 
 These rules are for building [Kotlin][kotlin] source with with
 [Bazel][bazel].
@@ -12,33 +12,30 @@ These rules are for building [Kotlin][kotlin] source with with
 
 ## Workspace rules
 
-Add the following to your WORKSPACE file:
+Add the following to your `WORKSPACE` file:
 
 ```python
 git_repository(
     name = "org_pubref_rules_kotlin",
     remote = "https://github.com/pubref/rules_kotlin.git",
-    tag = "v0.2.3", # update as needed
+    tag = "v0.3.0", # update as needed
 )
+
 load("@org_pubref_rules_kotlin//kotlin:rules.bzl", "kotlin_repositories")
+
 kotlin_repositories()
 ```
 
 This will fetch a
-[release](https://github.com/JetBrains/kotlin/releases) (currently
-1.1.2-2) and expose the shell scripts and the runtime library.
+[kotlin release](https://github.com/JetBrains/kotlin/releases)
+(currently 1.1.2-2) and load a number of dependencies related to
+dagger (used to build the `KotlinCompiler` bazel worker).
 
-```sh
-bazel query @com_github_jetbrains_kotlin//... --output label_kind
-# The kotlin runtime jar
-java_import rule @com_github_jetbrains_kotlin//:runtime
-# Script for the compiler
-sh_binary rule @com_github_jetbrains_kotlin//:kotlinc
-# Script for the runner
-sh_binary rule @com_github_jetbrains_kotlin//:kotlin
-```
+> You can override various dependencies loaded in the
+> `kotlin_repositories` rule via the `omit_*` options; see the source
+> file for details.
 
-## Package (BUILD file) rules
+## BUILD rules
 
 Add the following to your BUILD file:
 
@@ -101,6 +98,7 @@ android_binary(
 | `jars` | `label_list` | List of jar file targets (`*.jar`) |
 | `x_opts` | `string_list` | List of additional `-X` options to `kotlinc` |
 | `plugin_opts` | `string_dict` | List of additional `-P` options to `kotlinc` |
+| `use_worker` | `boolean` | Assign to `False` to disable the use of [bazel workers](https://bazel.build/blog/2015/12/10/java-workers.html).  |
 
 
 ### kotlin_binary
@@ -149,20 +147,6 @@ available to other java rules via a `java_import` rule.
 In summary, you most likely do not need to interact with the
 `kotlin_compile` rule directly.
 
-
-## bazel.rc
-
-With older versions of bazel, you may need to add the following line
-to your `tools/bazel.rc` file:
-
-```
-build --strategy=KotlinCompile=standalone
-```
-
-Alternatively, you can also add `--strategy=KotlinCompile=standalone`
-parameters to every `bazel run`, `bazel build`, etc. commands
-involving a kotlin rule.
-
 # Summary
 
 That's it!  Hopefully these rules with make it easy to mix kotlin and
@@ -188,9 +172,10 @@ $ bazel run examples/helloworld:main_java
 ## TODO
 
 1. Implement a `kotlin_test` rule.
-2. Proper `data` and runfiles support.
-3. Research incremental compilation and bazel worker integration.
-4. kapt integration.
+1. Proper `data` and runfiles support.
+2. Android support.
+4. kapt support.
+3. Incremental compilation.
 
 [bazel]: http://www.bazel.io
 [kotlin]: http://www.kotlinlang.org
