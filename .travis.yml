@@ -10,12 +10,6 @@ os:
 env:
   #- V=HEAD
   - V=0.4.5
-  - V=0.4.4
-  - V=0.4.3
-  - V=0.4.2
-  - V=0.4.1
-  - V=0.4.0
-  - V=0.3.2
 
 before_install:
   - OS=linux
