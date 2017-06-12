@@ -216,9 +216,10 @@ def kotlin_binary(name,
 
     native.java_binary(
         name = name,
-        runtime_deps = [
-            name + "_kt.jar",
-        ] + java_deps + [dep + "_kt" for dep in deps],
+        runtime_deps = [name + "_kt.jar"] + java_deps + [
+            dep + "_kt"
+            for dep in deps
+        ] + ["@com_github_jetbrains_kotlin//:runtime"],
         **kwargs
     )
 
