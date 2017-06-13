@@ -40,9 +40,9 @@ This will fetch a
 (currently 1.1.2-2) and load a number of dependencies related to
 dagger (used to build the `KotlinCompiler` bazel worker).
 
-> You can override various dependencies loaded in the
-> `kotlin_repositories` rule via the `omit_*` options; see the source
-> file for details.
+> You can override kotlin release via the `com_github_jetbrains_kotlin_url`, `com_github_jetbrains_kotlin_sha256` options
+> and various dependencies loaded in the `kotlin_repositories` rule via the `omit_*` options; 
+> see the source file for details.
 
 ## BUILD rules
 
