@@ -68,9 +68,9 @@ def kotlin_repositories(
         # This statement defines the @com_google_protobuf repo.
         native.http_archive(
             name = "com_google_protobuf",
-            urls = ["https://github.com/google/protobuf/archive/b4b0e304be5a68de3d0ee1af9b286f958750f5e4.zip"],
-            strip_prefix = "protobuf-b4b0e304be5a68de3d0ee1af9b286f958750f5e4",
-            sha256 = "ff771a662fb6bd4d3cc209bcccedef3e93980a49f71df1e987f6afa3bcdcba3a",
+            urls = ["https://github.com/google/protobuf/archive/a6189acd18b00611c1dc7042299ad75486f08a1a.zip"],
+            strip_prefix = "protobuf-a6189acd18b00611c1dc7042299ad75486f08a1a",
+            sha256 = "102b5024120215c5a34ad23d9dd459e8ccc37dc3ef4c73d466ab802b6e3e9512",
         )
 
     if not omit_com_google_protobuf_java:
@@ -78,9 +78,9 @@ def kotlin_repositories(
         # which is the Java proto runtime (base classes and common utilities).
         native.http_archive(
             name = "com_google_protobuf_java",
-            urls = ["https://github.com/google/protobuf/archive/b4b0e304be5a68de3d0ee1af9b286f958750f5e4.zip"],
-            strip_prefix = "protobuf-b4b0e304be5a68de3d0ee1af9b286f958750f5e4",
-            sha256 = "ff771a662fb6bd4d3cc209bcccedef3e93980a49f71df1e987f6afa3bcdcba3a",
+            urls = ["https://github.com/google/protobuf/archive/a6189acd18b00611c1dc7042299ad75486f08a1a.zip"],
+            strip_prefix = "protobuf-a6189acd18b00611c1dc7042299ad75486f08a1a",
+            sha256 = "102b5024120215c5a34ad23d9dd459e8ccc37dc3ef4c73d466ab802b6e3e9512",
         )
 
     if not omit_javax_inject:
