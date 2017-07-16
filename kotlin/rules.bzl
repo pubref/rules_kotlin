@@ -176,12 +176,13 @@ kotlin_compile = rule(
 )
 
 
-def kotlin_library(name, jars = [], java_deps = [], **kwargs):
+def kotlin_library(name, jars = [], java_deps = [], visibility = None, **kwargs):
 
     kotlin_compile(
         name = name,
         jars = jars,
         java_deps = java_deps,
+        visibility = visibility,
         **kwargs
     )
 
@@ -189,6 +190,7 @@ def kotlin_library(name, jars = [], java_deps = [], **kwargs):
         name = name + "_kt",
         jars = [name + ".jar"],
         deps = java_deps,
+        visibility = visibility,
         exports = [
             "@com_github_jetbrains_kotlin//:runtime",
         ],
@@ -202,6 +204,7 @@ def kotlin_binary(name,
                   x_opts = [],
                   plugin_opts = {},
                   java_deps = [],
+                  visibility = None,
                   **kwargs):
 
     kotlin_compile(
@@ -212,6 +215,7 @@ def kotlin_binary(name,
         deps = deps,
         x_opts = x_opts,
         plugin_opts = plugin_opts,
+        visibility = visibility,
     )
 
     native.java_binary(
@@ -220,6 +224,7 @@ def kotlin_binary(name,
             dep + "_kt"
             for dep in deps
         ] + ["@com_github_jetbrains_kotlin//:runtime"],
+        visibility = visibility,
         **kwargs
     )
 
@@ -231,6 +236,7 @@ def kotlin_test(name,
                 x_opts = [],
                 plugin_opts = {},
                 java_deps = [],
+                visibility = None,
                 **kwargs):
 
     java_deps.append("@com_github_jetbrains_kotlin//:test")
@@ -243,6 +249,7 @@ def kotlin_test(name,
         deps = deps,
         x_opts = x_opts,
         plugin_opts = plugin_opts,
+        visibility = None,
     )
 
     native.java_test(
@@ -250,5 +257,6 @@ def kotlin_test(name,
         runtime_deps = [
             name + "_kt.jar",
         ] + java_deps + [dep + "_kt" for dep in deps],
+        visibility = None,
         **kwargs
     )
