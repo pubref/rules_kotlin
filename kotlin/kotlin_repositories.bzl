@@ -42,8 +42,9 @@ def kotlin_repositories(
         com_github_jetbrains_kotlin_url = "https://github.com/JetBrains/kotlin/releases/download/v1.1.2-2/kotlin-compiler-1.1.2-2.zip",
         com_github_jetbrains_kotlin_sha256 = "57e18528f665675206e88cdc0bd42d1550b10f2508e08035270974d7abec3f2f",
         omit_com_github_jetbrains_kotlin = False,
-        omit_com_google_protobuf = False,
-        omit_com_google_protobuf_java = False,
+        #omit_com_google_protobuf = False,
+        #omit_com_google_protobuf_java = False,
+        omit_com_google_protobuf_protobuf_java = False,
         omit_javax_inject = False,
         omit_com_google_errorprone_error_prone_annotations = False,
         omit_com_google_code_findbugs_jsr305 = False,
@@ -62,25 +63,33 @@ def kotlin_repositories(
             strip_prefix = "kotlinc",
         )
 
-    if not omit_com_google_protobuf:
-        # proto_library rules implicitly depend on @com_google_protobuf//:protoc,
-        # which is the proto-compiler.
-        # This statement defines the @com_google_protobuf repo.
-        native.http_archive(
-            name = "com_google_protobuf",
-            urls = ["https://github.com/google/protobuf/archive/a6189acd18b00611c1dc7042299ad75486f08a1a.zip"],
-            strip_prefix = "protobuf-a6189acd18b00611c1dc7042299ad75486f08a1a",
-            sha256 = "102b5024120215c5a34ad23d9dd459e8ccc37dc3ef4c73d466ab802b6e3e9512",
-        )
+    # UN-COMMENT these to build native worker proto from source.
+    # if not omit_com_google_protobuf:
+    #     proto_library rules implicitly depend on @com_google_protobuf//:protoc,
+    #     which is the proto-compiler.
+    #     This statement defines the @com_google_protobuf repo.
+    #     native.http_archive(
+    #         name = "com_google_protobuf",
+    #         urls = ["https://github.com/google/protobuf/archive/a6189acd18b00611c1dc7042299ad75486f08a1a.zip"],
+    #         strip_prefix = "protobuf-a6189acd18b00611c1dc7042299ad75486f08a1a",
+    #         sha256 = "102b5024120215c5a34ad23d9dd459e8ccc37dc3ef4c73d466ab802b6e3e9512",
+    #     )
 
-    if not omit_com_google_protobuf_java:
-        # java_proto_library rules implicitly depend on @com_google_protobuf_java//:java_toolchain,
-        # which is the Java proto runtime (base classes and common utilities).
-        native.http_archive(
-            name = "com_google_protobuf_java",
-            urls = ["https://github.com/google/protobuf/archive/a6189acd18b00611c1dc7042299ad75486f08a1a.zip"],
-            strip_prefix = "protobuf-a6189acd18b00611c1dc7042299ad75486f08a1a",
-            sha256 = "102b5024120215c5a34ad23d9dd459e8ccc37dc3ef4c73d466ab802b6e3e9512",
+    # if not omit_com_google_protobuf_java:
+    #     # java_proto_library rules implicitly depend on @com_google_protobuf_java//:java_toolchain,
+    #     # which is the Java proto runtime (base classes and common utilities).
+    #     native.http_archive(
+    #         name = "com_google_protobuf_java",
+    #         urls = ["https://github.com/google/protobuf/archive/a6189acd18b00611c1dc7042299ad75486f08a1a.zip"],
+    #         strip_prefix = "protobuf-a6189acd18b00611c1dc7042299ad75486f08a1a",
+    #         sha256 = "102b5024120215c5a34ad23d9dd459e8ccc37dc3ef4c73d466ab802b6e3e9512",
+    #     )
+
+    if not omit_com_google_protobuf_protobuf_java:
+        native.maven_jar(
+            name = "com_google_protobuf_protobuf_java",
+            artifact = "com.google.protobuf:protobuf-java:3.4.0",
+            sha1 = "b32aba0cbe737a4ca953f71688725972e3ee927c",
         )
 
     if not omit_javax_inject:
