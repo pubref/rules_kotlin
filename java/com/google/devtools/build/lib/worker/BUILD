@@ -15,33 +15,12 @@
 licenses(["notice"])  # Apache 2.0
 
 java_library(
-    name = "BazelWorker",
+    name = "worker",
     srcs = [
-        "BazelWorker.java",
+        "WorkerProtocol.java",
     ],
     deps = [
-        # Flip these to build protobuf natively rather than use the
-        # pre-generated version.
-        "//java/com/google/devtools/build/lib/worker",
-        #":worker_protocol_java_proto",
-
-        "//java/io/bazel/rules/closure/program",
-        "@com_google_dagger",
-        "@com_google_guava",
-        "@javax_inject",
+        "@com_google_protobuf_protobuf_java//jar",
     ],
     visibility = ["//visibility:public"],
 )
-
-# UN-COMMENT this to rebuild the proto from source
-# java_proto_library(
-#     name = "worker_protocol_java_proto",
-#     deps = [
-#         ":worker_protocol_java_proto_library",
-#     ]
-# )
-
-# proto_library(
-#     name = "worker_protocol_java_proto_library",
-#     srcs = ["worker_protocol.proto"],
-# )
