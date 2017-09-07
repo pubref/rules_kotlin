@@ -1,5 +1,5 @@
 <table><tr>
-<td><img src="https://github.com/pubref/rules_protobuf/blob/master/images/bazel.png" width="120"/></td>
+<td><img src="https://bazel.build/images/bazel-icon.svg" width="120"/></td>
 <td><img src="https://kotlinlang.org/assets/images/open-graph/kotlin_250x250.png" width="120"/></td>
 </tr><tr>
 <td>Bazel</td>
@@ -27,7 +27,7 @@ Add the following to your `WORKSPACE` file:
 git_repository(
     name = "org_pubref_rules_kotlin",
     remote = "https://github.com/pubref/rules_kotlin.git",
-    tag = "v0.3.1", # update as needed
+    tag = "v0.4.0", # update as needed
 )
 
 load("@org_pubref_rules_kotlin//kotlin:rules.bzl", "kotlin_repositories")
@@ -37,11 +37,11 @@ kotlin_repositories()
 
 This will fetch a
 [kotlin release](https://github.com/JetBrains/kotlin/releases)
-(currently 1.1.2-2) and load a number of dependencies related to
+(currently 1.1.4-3) and load a number of dependencies related to
 dagger (used to build the `KotlinCompiler` bazel worker).
 
 > You can override kotlin release via the `com_github_jetbrains_kotlin_url`, `com_github_jetbrains_kotlin_sha256` options
-> and various dependencies loaded in the `kotlin_repositories` rule via the `omit_*` options; 
+> and various dependencies loaded in the `kotlin_repositories` rule via the `omit_*` options;
 > see the source file for details.
 
 ## BUILD rules
@@ -213,8 +213,8 @@ $ bazel test examples/helloworld:main_kt_test
 
 1. Proper `data` and runfiles support.
 2. Proper android support.
-4. kapt support.
-3. Incremental compilation.
+3. kapt support.
+4. Incremental compilation.
 
 [bazel]: http://www.bazel.io
 [kotlin]: http://www.kotlinlang.org
