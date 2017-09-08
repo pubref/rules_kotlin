@@ -148,6 +148,115 @@ Includes all `kotlin_library` attributes as well as:
 | `main_class` | `string` | Main class to run with the `kotlin_binary` rule |
 
 
+### kotlin_android_library
+
+A `kotlin_android_library` macro takes mostly the same arguments as a
+`kotlin_library`,
+plus some Android specific arguments like
+`aar_deps`, `resource_files`, `custom_package`, `manifest`, etc.
+An example with combined source and resource:
+
+```python
+PACKAGE = "com.company.app"
+MANIFEST = "AndroidManifest.xml"
+
+kotlin_android_library(
+    name = "src",
+    srcs = glob(["src/**/*.kt"]),
+    custom_package = PACKAGE,
+    manifest = MANIFEST,
+    resource_files = glob(["res/**/*"]),
+    java_deps = [
+        "@com_squareup_okhttp3_okhttp//jar",
+        "@com_squareup_okio_okio//jar",
+    ],
+    aar_deps = [
+        "@androidsdk//com.android.support:appcompat-v7-25.3.1",
+        "@androidsdk//com.android.support:cardview-v7-25.3.1",
+        "@androidsdk//com.android.support:recyclerview-v7-25.3.1",
+    ],
+)
+
+android_binary(
+    name = "app",
+    custom_package = PACKAGE,
+    manifest = MANIFEST,
+    deps = [
+        ":src",
+    ],
+)
+```
+
+If you prefer to separate your source files and resource files in
+different Bazel rules (for example the resource files are also used
+by java `android_library` rules), you can do so as example:
+
+```python
+PACKAGE = "com.company.app"
+MANIFEST = "AndroidManifest.xml"
+
+android_library(
+    name = "res",
+    custom_package = PACKAGE,
+    manifest = MANIFEST,
+    resource_files = glob(["res/**/*"]),
+    aar_deps = [
+        "@androidsdk//com.android.support:appcompat-v7-25.3.1",
+        "@androidsdk//com.android.support:cardview-v7-25.3.1",
+        "@androidsdk//com.android.support:recyclerview-v7-25.3.1",
+    ],
+)
+
+android_library(
+    name = "java",
+    srcs = glob(["src/**/*.java"]),
+    deps = [
+        ":res",
+        # And other depedencies
+    ]
+)
+
+kotlin_android_library(
+    name = "kt",
+    srcs = glob(["src/**/*.kt"]),
+    aar_deps = [
+        "@androidsdk//com.android.support:appcompat-v7-25.3.1",
+        "@androidsdk//com.android.support:cardview-v7-25.3.1",
+        "@androidsdk//com.android.support:recyclerview-v7-25.3.1",
+    ],
+    android_deps = [
+        ":res",
+    ]
+)
+
+android_binary(
+    name = "app",
+    custom_package = PACKAGE,
+    manifest = MANIFEST,
+    deps = [
+        ":java",
+        ":kt",
+        ":res",
+    ],
+)
+```
+
+Please note that if you want to use `R` class in your Kotlin code,
+your `kotlin_android_library` rule need to either have the
+`resource_files` and related arguments,
+or have the resource rule in `android_deps`.
+
+#### kotlin_android_library attributes
+
+Includes all `kotlin_library` attributes as well as:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `aar_deps` | `label_list` | List of AAR library targets |
+
+And also [`android_library` arguments](android_library).
+
+
 ### kotlin_test
 
 The `kotlin_test` rule is nearly identical the `kotlin_binary` rule
@@ -218,3 +327,4 @@ $ bazel test examples/helloworld:main_kt_test
 
 [bazel]: http://www.bazel.io
 [kotlin]: http://www.kotlinlang.org
+[android_library]: https://docs.bazel.build/versions/master/be/android.html#android_library_args

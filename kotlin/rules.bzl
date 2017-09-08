@@ -176,6 +176,83 @@ kotlin_compile = rule(
 )
 
 
+def kotlin_android_library(
+    name,
+    srcs = [],
+    deps = [],
+    java_deps = [],
+    aar_deps = [],
+    resource_files = [],
+    custom_package = None,
+    manifest = None,
+    proguard_specs = [],
+    visibility = None,
+    **kwargs):
+
+    res_deps = []
+    if len(resource_files) > 0:
+        native.android_library(
+            name = name + "_res",
+            custom_package = custom_package,
+            manifest = manifest,
+            resource_files = resource_files,
+            deps = aar_deps + java_deps,
+            **kwargs
+        )
+        res_deps.append(name + "_res")
+
+    native.android_library(
+        name = name + "_aar",
+        neverlink = 1,
+        deps = aar_deps,
+    )
+
+    native.java_import(
+        name = name + "_sdk",
+        neverlink = 1,
+        jars = [
+            "//tools/defaults:android_jar",
+        ],
+    )
+
+    kotlin_compile(
+        name = name + "_compile",
+        srcs = srcs,
+        deps = deps,
+        java_deps = java_deps + [
+            name + "_sdk",
+            name + "_aar",
+        ],
+        android_deps = res_deps,
+        **kwargs
+    )
+
+    # Convert kotlin deps into java deps
+    kt_deps = []
+    for dep in deps:
+        kt_deps.append(dep + "_kt")
+
+    native.java_import(
+        name = name + "_kt",
+        jars = [name + "_compile.jar"],
+        deps = kt_deps + java_deps,
+        visibility = visibility,
+        exports = [
+            "@com_github_jetbrains_kotlin//:runtime",
+        ],
+    )
+
+    native.android_library(
+        name = name,
+        deps = aar_deps + res_deps + [
+            name + "_kt",
+        ],
+        proguard_specs = proguard_specs,
+        visibility = visibility,
+        **kwargs
+    )
+
+
 def kotlin_library(name, jars = [], java_deps = [], visibility = None, **kwargs):
 
     kotlin_compile(
