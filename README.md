@@ -9,15 +9,17 @@
 # Kotlin Rules for Bazel
 [![Build Status](https://travis-ci.org/pubref/rules_kotlin.svg?branch=master)](https://travis-ci.org/pubref/rules_kotlin)
 
-> Note: **These rules require Bazel 0.4.5 or higher**.
+Build [Kotlin][kotlin] source with with [Bazel][bazel].
 
-These rules are for building [Kotlin][kotlin] source with with
-[Bazel][bazel].
+| Rule | Description |
+| ---: | :--- |
+| `kotlin_repositories` | Load workspace dependencies |
+| [`kotlin_library`](#kotlin_library) | Build a java library from kotlin source |
+| [`kotlin_binary`](#kotlin_binary) | Build a java binary from kotlin source |
+| [`kotlin_android_library`](#kotlin_android_library) | Build an android library from kotlin source |
+| [`kotlin_test`](#kotlin_test) | Run a kotlin test |
 
-1. [kotlin_repositories](#kotlin_repositories)
-1. [kotlin_library](#kotlin_library)
-1. [kotlin_binary](#kotlin_binary)
-1. [kotlin_test](#kotlin_test)
+> Note: **Bazel 0.4.5 or higher is required**.
 
 ## Workspace rules
 
@@ -254,7 +256,7 @@ Includes all `kotlin_library` attributes as well as:
 | --- | --- | --- |
 | `aar_deps` | `label_list` | List of AAR library targets |
 
-And also [`android_library` arguments](android_library).
+And also [`android_library`](android_library) arguments.
 
 
 ### kotlin_test
@@ -321,10 +323,9 @@ $ bazel test examples/helloworld:main_kt_test
 ## TODO
 
 1. Proper `data` and runfiles support.
-2. Proper android support.
-3. kapt support.
-4. Incremental compilation.
+2. kapt support.
+3. Incremental compilation.
 
-[bazel]: http://www.bazel.io
+[bazel]: http://www.bazel.build
 [kotlin]: http://www.kotlinlang.org
 [android_library]: https://docs.bazel.build/versions/master/be/android.html#android_library_args
