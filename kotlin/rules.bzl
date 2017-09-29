@@ -66,7 +66,7 @@ def _kotlin_compile_impl(ctx):
 
     if jars:
         # De-duplicate
-        jarsetlist = list(set(jars))
+        jarsetlist = depset(jars).to_list()
         args += ["-cp", ":".join([file.path for file in jarsetlist])]
         inputs += jarsetlist
 
@@ -87,7 +87,7 @@ def _kotlin_compile_impl(ctx):
     )
 
     return struct(
-        files = set([kt_jar]),
+        files = depset([kt_jar]),
         runfiles = ctx.runfiles(collect_data = True),
         kt = struct(
             srcs = ctx.attr.srcs,
