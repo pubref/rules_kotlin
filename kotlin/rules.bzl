@@ -204,7 +204,7 @@ def kotlin_android_library(
     native.android_library(
         name = name + "_aar",
         neverlink = 1,
-        deps = aar_deps,
+        exports = aar_deps,
     )
 
     native.java_import(
@@ -244,7 +244,7 @@ def kotlin_android_library(
 
     native.android_library(
         name = name,
-        deps = aar_deps + res_deps + [
+        exports = aar_deps + res_deps + [
             name + "_kt",
         ],
         proguard_specs = proguard_specs,
