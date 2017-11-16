@@ -65,11 +65,7 @@ def _kotlin_compile_impl(ctx):
 
     if jars:
         # De-duplicate
-        jarsetlist = depset(jars).to_list()
-        jarlist = []
-        for f in jarsetlist:
-            if not f.basename.startswith('kotlin-'):
-                jarlist.append(f)
+        jarlist = depset(jars).to_list()
         args += ["-cp", ":".join([f.path for f in jarlist])]
         inputs += jarlist
         if ctx.attr.verbose:
