@@ -19,7 +19,7 @@ Build [Kotlin][kotlin] source with with [Bazel][bazel].
 | [`kotlin_android_library`](#kotlin_android_library) | Build an android library from kotlin source |
 | [`kotlin_test`](#kotlin_test) | Run a kotlin test |
 
-> Note: **Bazel 0.4.5 or higher is required**.
+> Note: **Bazel 0.7.0 or higher is required for rules_kotlin 0.5.0**.
 
 ## Workspace rules
 
@@ -29,7 +29,7 @@ Add the following to your `WORKSPACE` file:
 git_repository(
     name = "org_pubref_rules_kotlin",
     remote = "https://github.com/pubref/rules_kotlin.git",
-    tag = "v0.4.1", # update as needed
+    tag = "v0.5.0", # update as needed
 )
 
 load("@org_pubref_rules_kotlin//kotlin:rules.bzl", "kotlin_repositories")
