@@ -1,0 +1,42 @@
+local_repository(
+    name = 'org_pubref_rules_kotlin',
+    path = '../..',
+)
+
+load('@org_pubref_rules_kotlin//kotlin:rules.bzl', 'kotlin_repositories')
+
+kotlin_repositories()
+
+git_repository(
+    name = 'org_pubref_rules_maven',
+    remote = 'https://github.com/pubref/rules_maven',
+    commit = '9c3b07a6d9b195a1192aea3cd78afd1f66c80710',
+)
+
+load('@org_pubref_rules_maven//maven:rules.bzl', 'maven_repositories')
+maven_repositories()
+
+load('@org_pubref_rules_maven//maven:rules.bzl', 'maven_repository')
+
+maven_repository(
+    name = 'tornadofx',
+    deps = [
+        'no.tornado:tornadofx:1.7.12',
+    ],
+    omit = [
+        '919f0dfe192fb4e063e7dacadee7f8bb9a2672a9:org.jetbrains:annotations:13.0',
+        '222365b4b684bfe35a7676c5ff69b4b414e398fa:org.jetbrains.kotlin:kotlin-reflect:1.1.51',
+        'e34fe80c9714240525f665113dd3749415515655:org.jetbrains.kotlin:kotlin-stdlib:1.1.51',
+        '8b5933578dc55f32cfc1a25f1db6371e4161fb8f:org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.51',
+        'cc8e639ff087472268912159cd66c01f2765c657:org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.51',
+    ],
+    transitive_deps = [
+        'b55f582add177fe166c9b375c6074eca7cee8642:no.tornado:tornadofx:1.7.12',
+        '3178f73569fd7a1e5ffc464e680f7a8cc784b85a:org.glassfish:javax.json:1.0.4',
+    ],
+)
+
+load('@tornadofx//:rules.bzl', 'tornadofx_compile')
+
+tornadofx_compile()
+

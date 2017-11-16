@@ -32,18 +32,19 @@ def _kotlin_compile_impl(ctx):
     # preloader
     inputs += ctx.files._kotlin_home
 
+    args += ctx.attr.args
+    
     # Make classpath if needed.  Include those from this and dependent rules.
-    jars = []
+    jars = depset()
 
-    # Populate from (transitive) java dependencies
+    # Populate from (transitive) java dependencies.  
     for dep in ctx.attr.java_deps:
         # Add-in all source and generated jar files
-        for file in dep.files:
-            jars.append(file)
-        # Add-in transitive dependencies
-        for file in dep.java.transitive_deps:
-            jars.append(file)
-
+        if java_common.provider in dep:
+            info = dep[java_common.provider]
+            # Don't use the ABI jars!
+            jars += info.full_compile_jars
+            
     # Populate from (transitive) kotlin dependencies
     for dep in ctx.attr.deps:
         jars += [file for file in dep.kt.transitive_jars]
@@ -53,11 +54,9 @@ def _kotlin_compile_impl(ctx):
         # The fileset object is either a ConfiguredTarget OR a depset.
         files = getattr(fileset, 'files', None)
         if files:
-            for file in files:
-                jars += [file]
+            jars = jars.union(files)
         else:
-            for file in fileset:
-                jars += [file]
+            jars = jars.union(fileset)
 
     # Populate from android dependencies
     for dep in ctx.attr.android_deps:
@@ -66,15 +65,21 @@ def _kotlin_compile_impl(ctx):
 
     if jars:
         # De-duplicate
-        jarsetlist = depset(jars).to_list()
-        args += ["-cp", ":".join([file.path for file in jarsetlist])]
-        inputs += jarsetlist
-
+        jarlist = depset(jars).to_list()
+        args += ["-cp", ":".join([f.path for f in jarlist])]
+        inputs += jarlist
+        if ctx.attr.verbose:
+            print("kotlin compile classpath: \n" + "\n".join([file.path for file in jarlist]))
+            
     # Add in filepaths
     for file in ctx.files.srcs:
         inputs += [file]
         args += [file.path]
 
+
+    if ctx.attr.verbose > 1:
+        print("kotlin compile arguments: \n%s" % "\n".join(args))
+        
     # Run the compiler
     ctx.action(
         mnemonic = "KotlinCompile",
@@ -92,7 +97,7 @@ def _kotlin_compile_impl(ctx):
         kt = struct(
             srcs = ctx.attr.srcs,
             jar = kt_jar,
-            transitive_jars = [kt_jar] + jars,
+            transitive_jars = [kt_jar] + jars.to_list(),
         ),
     )
 
@@ -121,6 +126,11 @@ _kotlin_compile_attrs = {
         providers = ["java"],
     ),
 
+    # Add debugging info for the rule
+    "verbose": attr.int(
+        default = 0,
+    ),
+    
     # Dependent android rules.
     "android_deps": attr.label_list(
         providers = ["android"],
@@ -140,6 +150,9 @@ _kotlin_compile_attrs = {
     # Advanced options
     "x_opts": attr.string_list(),
 
+    # Other args
+    "args": attr.string_list(),
+    
     # Plugin options
     "plugin_opts": attr.string_dict(),
 
@@ -281,6 +294,8 @@ def kotlin_binary(name,
                   x_opts = [],
                   plugin_opts = {},
                   java_deps = [],
+                  compile_args = [],
+                  verbose = None,
                   visibility = None,
                   **kwargs):
 
@@ -291,16 +306,27 @@ def kotlin_binary(name,
         srcs = srcs,
         deps = deps,
         x_opts = x_opts,
+        args = compile_args,
         plugin_opts = plugin_opts,
         visibility = visibility,
+        verbose = verbose,
     )
 
+    runtime_deps = [name + "_kt.jar"] + java_deps + [
+        dep + "_kt"
+        for dep in deps
+    ] + ["@com_github_jetbrains_kotlin//:runtime"]
+    
+    if len(jars):
+        native.java_import(
+            name = name + "_jars",
+            jars = jars,
+        )
+        runtime_deps += [name + "_jars"]
+    
     native.java_binary(
         name = name,
-        runtime_deps = [name + "_kt.jar"] + java_deps + [
-            dep + "_kt"
-            for dep in deps
-        ] + ["@com_github_jetbrains_kotlin//:runtime"],
+        runtime_deps = runtime_deps,
         visibility = visibility,
         **kwargs
     )
