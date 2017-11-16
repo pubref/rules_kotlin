@@ -44,7 +44,7 @@ def _kotlin_compile_impl(ctx):
             info = dep[java_common.provider]
             # Don't use the ABI jars!
             jars += info.full_compile_jars
-
+            
     # Populate from (transitive) kotlin dependencies
     for dep in ctx.attr.deps:
         jars += [file for file in dep.kt.transitive_jars]
@@ -68,7 +68,7 @@ def _kotlin_compile_impl(ctx):
         jarsetlist = depset(jars).to_list()
         jarlist = []
         for f in jarsetlist:
-            if f.path.find('kotlin') < 0:
+            if not f.basename.startswith('kotlin-'):
                 jarlist.append(f)
         args += ["-cp", ":".join([f.path for f in jarlist])]
         inputs += jarlist
