@@ -106,7 +106,7 @@ def kotlin_repositories(
 
     if not omit_com_google_errorprone_error_prone_annotations:
         java_import_external(
-            name = "com_google_errorprone_error_prone_annotations",
+            name = "com_google_errorprone_annotations",
             licenses = ["notice"],  # Apache 2.0
             jar_sha256 = "e7749ffdf03fb8ebe08a727ea205acb301c8791da837fee211b99b04f9d79c46",
             jar_urls = [
@@ -118,7 +118,7 @@ def kotlin_repositories(
 
     if not omit_com_google_code_findbugs_jsr305:
         java_import_external(
-            name = "com_google_code_findbugs_jsr305",
+            name = "com_google_code_findbugs",
             licenses = ["notice"],  # BSD 3-clause
             jar_urls = [
                 "http://bazel-mirror.storage.googleapis.com/repo1.maven.org/maven2/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar",
@@ -139,8 +139,8 @@ def kotlin_repositories(
             ],
             jar_sha256 = "36a666e3b71ae7f0f0dca23654b67e086e6c93d192f60ba5dfd5519db6c288c8",
             deps = [
-                "@com_google_code_findbugs_jsr305",
-                "@com_google_errorprone_error_prone_annotations",
+                "@com_google_code_findbugs",
+                "@com_google_errorprone_annotations",
             ],
         )
 
@@ -177,7 +177,7 @@ def kotlin_repositories(
             ],
             licenses = ["notice"],  # Apache 2.0
             deps = [
-                "@com_google_code_findbugs_jsr305",
+                "@com_google_code_findbugs",
                 "@com_google_dagger//:runtime",
                 "@com_google_dagger_producers//:runtime",
                 "@com_google_guava",
