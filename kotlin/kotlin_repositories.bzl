@@ -39,8 +39,8 @@ exports_files(["src"])
 
 
 def kotlin_repositories(
-        com_github_jetbrains_kotlin_url = "https://github.com/JetBrains/kotlin/releases/download/v1.1.4-3/kotlin-compiler-1.1.4-3.zip",
-        com_github_jetbrains_kotlin_sha256 = "f4ceab8a21ad26a25712a1499999a726cea918be7bec022937f9ae5ca0c943ea",
+        com_github_jetbrains_kotlin_url = "https://github.com/JetBrains/kotlin/releases/download/v1.2.0/kotlin-compiler-1.2.0.zip",
+        com_github_jetbrains_kotlin_sha256 = "895d0f8286db3e4f43d67cd5e09b600af6e0a5017cb74072d1b09c78b697775a",
         omit_com_github_jetbrains_kotlin = False,
         #omit_com_google_protobuf = False,
         #omit_com_google_protobuf_java = False,
