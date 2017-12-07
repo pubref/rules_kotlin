@@ -54,14 +54,14 @@ def _kotlin_compile_impl(ctx):
         # The fileset object is either a ConfiguredTarget OR a depset.
         files = getattr(fileset, 'files', None)
         if files:
-            jars = jars.union(files)
+            jars += files
         else:
-            jars = jars.union(fileset)
+            jars += fileset
 
     # Populate from android dependencies
     for dep in ctx.attr.android_deps:
         if dep.android.defines_resources:
-            jars.append(dep.android.resource_jar.class_jar)
+            jars += depset([dep.android.resource_jar.class_jar])
 
     if jars:
         # De-duplicate
