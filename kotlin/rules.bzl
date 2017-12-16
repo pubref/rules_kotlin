@@ -1,6 +1,17 @@
 load("//kotlin:kotlin_repositories.bzl", "kotlin_repositories")
 
 # ################################################################
+# Intelij Aspect Constants
+# ################################################################
+_target_type_unknown = "unknown"
+
+_target_type_library = "kotlin_library"
+_target_type_binary = "kotlin_binary"
+_target_type_test = "kotlin_test"
+
+_target_types = [_target_type_binary, _target_type_library, _target_type_test]
+
+# ################################################################
 # Execution phase
 # ################################################################
 
@@ -95,7 +106,9 @@ def _kotlin_compile_impl(ctx):
         files = depset([kt_jar]),
         runfiles = ctx.runfiles(collect_data = True),
         kt = struct(
-            srcs = ctx.attr.srcs,
+            srcs = ctx.attr.srcs, # intelij aspect needs this.
+            outputs = struct(jars = [struct(class_jar = kt_jar, ijar = None)]), # intelij aspect needs this.
+            target_type = ctx.attr.kt_target_type, # likely to prove usefull for the intelij aspect.
             jar = kt_jar,
             transitive_jars = [kt_jar] + jars.to_list(),
         ),
@@ -130,7 +143,7 @@ _kotlin_compile_attrs = {
     "verbose": attr.int(
         default = 0,
     ),
-    
+
     # Dependent android rules.
     "android_deps": attr.label_list(
         providers = ["android"],
@@ -152,7 +165,7 @@ _kotlin_compile_attrs = {
 
     # Other args
     "args": attr.string_list(),
-    
+
     # Plugin options
     "plugin_opts": attr.string_dict(),
 
@@ -174,6 +187,11 @@ _kotlin_compile_attrs = {
         cfg = 'host',
     ),
 
+    # a provider attribute representing the target type.
+    "kt_target_type": attr.string(
+      default=_target_type_unknown,
+      mandatory = True
+    )
 }
 
 
@@ -273,6 +291,7 @@ def kotlin_library(name, jars = [], java_deps = [], visibility = None, **kwargs)
         jars = jars,
         java_deps = java_deps,
         visibility = visibility,
+        kt_target_type = _target_type_library,
         **kwargs
     )
 
@@ -309,6 +328,7 @@ def kotlin_binary(name,
         args = compile_args,
         plugin_opts = plugin_opts,
         visibility = visibility,
+        kt_target_type = _target_type_binary,
         verbose = verbose,
     )
 
@@ -316,14 +336,14 @@ def kotlin_binary(name,
         dep + "_kt"
         for dep in deps
     ] + ["@com_github_jetbrains_kotlin//:runtime"]
-    
+
     if len(jars):
         native.java_import(
             name = name + "_jars",
             jars = jars,
         )
         runtime_deps += [name + "_jars"]
-    
+
     native.java_binary(
         name = name,
         runtime_deps = runtime_deps,
@@ -352,6 +372,7 @@ def kotlin_test(name,
         deps = deps,
         x_opts = x_opts,
         plugin_opts = plugin_opts,
+        kt_target_type = _target_type_test,
         visibility = None,
     )
 
