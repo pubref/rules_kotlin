@@ -361,13 +361,12 @@ def kotlin_test(name,
                 java_deps = [],
                 visibility = None,
                 **kwargs):
-
-    java_deps.append("@com_github_jetbrains_kotlin//:test")
+    _java_deps = java_deps + ["@com_github_jetbrains_kotlin//:test"]
 
     kotlin_compile(
         name = name + "_kt",
         jars = jars,
-        java_deps = java_deps,
+        java_deps = _java_deps,
         srcs = srcs,
         deps = deps,
         x_opts = x_opts,
@@ -380,7 +379,7 @@ def kotlin_test(name,
         name = name,
         runtime_deps = [
             name + "_kt.jar",
-        ] + java_deps + [dep + "_kt" for dep in deps],
+        ] + _java_deps + [dep + "_kt" for dep in deps],
         visibility = None,
         **kwargs
     )
