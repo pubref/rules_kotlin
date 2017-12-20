@@ -77,7 +77,7 @@ def _kotlin_compile_impl(ctx):
     if jars:
         # De-duplicate
         jarlist = depset(jars).to_list()
-        args += ["-cp", ":".join([f.path for f in jarlist])]
+        args += ["-cp", ctx.configuration.host_path_separator.join([f.path for f in jarlist])]
         inputs += jarlist
         if ctx.attr.verbose:
             print("kotlin compile classpath: \n" + "\n".join([file.path for file in jarlist]))
