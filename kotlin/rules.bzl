@@ -255,6 +255,7 @@ def kotlin_android_library(
             name + "_aar",
         ],
         android_deps = res_deps,
+        kt_target_type = _target_type_library,
         **kwargs
     )
 
