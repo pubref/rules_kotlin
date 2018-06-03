@@ -242,7 +242,7 @@ def kotlin_android_library(
         name = name + "_sdk",
         neverlink = 1,
         jars = [
-            "//tools/defaults:android_jar",
+            "@bazel_tools//tools/android:android_jar",
         ],
     )
 
